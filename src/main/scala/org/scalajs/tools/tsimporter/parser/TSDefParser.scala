@@ -46,7 +46,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
       "{", "}", "(", ")", "[", "]", "<", ">",
       ".", ";", ",", "?", ":", "=",
       // TypeScript-specific
-      "...", "=>"
+      "...", "=>", "|"
   )
 
   def parseDefinitions(input: Reader[Char]) =
@@ -177,7 +177,8 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     }
 
   lazy val baseTypeDesc: Parser[TypeTree] = (
-      typeRef
+      unionType
+    | typeRef
     | objectType
     | functionType
   )
@@ -205,6 +206,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val objectType: Parser[TypeTree] =
     memberBlock ^^ ObjectType
+
+  lazy val unionType: Parser[TypeTree] =
+    rep1sep(typeDesc, "|") ^^ { case types => UnionType(types) }
 
   lazy val memberBlock: Parser[List[MemberTree]] =
     "{" ~> rep(typeMember <~ opt(";")) <~ "}"

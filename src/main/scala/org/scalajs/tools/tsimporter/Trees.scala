@@ -126,6 +126,8 @@ object Trees {
 
   case class RepeatedType(underlying: TypeTree) extends TypeTree
 
+  case class UnionType(types: List[TypeTree]) extends TypeTree
+
   // Type members
 
   case class CallMember(signature: FunSignature) extends MemberTree
